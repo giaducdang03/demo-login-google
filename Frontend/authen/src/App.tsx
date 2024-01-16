@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { config } from "./config/config";
 
 interface User {
   name?: string;
@@ -9,8 +10,14 @@ interface User {
 function App() {
   const [user, setUser] = useState<User>({});
 
-  const handleCredentialResponse = (response: { credential: string }) => {
+  const handleCredentialResponse = async (response: { credential: string }) => {
     console.log("Encoded JWT ID token: " + response.credential);
+    try {
+      const res = await config.post("/api/LoginGoogle", response.credential);
+      console.log(">>> res", res);
+    } catch (err) {
+      console.log("Error fetching", err);
+    }
     const decoded = jwtDecode(response.credential) as User;
     setUser(decoded);
     document.getElementById("buttonDiv")!.hidden = true;
